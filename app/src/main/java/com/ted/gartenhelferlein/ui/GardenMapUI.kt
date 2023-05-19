@@ -17,6 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.ted.gartenhelferlein.R
@@ -50,17 +51,23 @@ fun ResetButton(modifier: Modifier, setTranslation: (Offset) -> Unit, setScale: 
 @Composable
 fun DrawMap(scale: MutableState<Float>, translation: MutableState<Offset>) {
     val centroidPos = remember { mutableStateOf(Offset.Zero) }
+    val middle = remember {
+        mutableStateOf(Offset.Zero)
+    }
     Box(modifier = Modifier
         .fillMaxSize()
+        .onSizeChanged {
+            middle.value = Offset(it.width / 2f, it.height / 2f)
+        }
         .pointerInput(Unit) {
             // TODO: Zoom around centroid
             detectTransformGestures { centroid, pan, zoom, _ ->
-                centroidPos.value = centroid
-                scale.value *= zoom
-                translation.value += pan*zoom
+                val adjust: Offset = (centroid - (middle.value + translation.value)) * (1f - zoom)
+                centroidPos.value = centroid // DEBUG
+                scale.value *= zoom // TODO: Restrain zoom to zoomRange
+                translation.value += pan + adjust
             }
         }) {
-        // Text(text = "Centroid: ${centroidPos.value}", modifier = Modifier.align(Alignment.TopStart))
         Image(imageVector = ImageVector.vectorResource(id = R.drawable.garten_map),
             contentDescription = "Garden Map",
             modifier = Modifier
@@ -72,5 +79,6 @@ fun DrawMap(scale: MutableState<Float>, translation: MutableState<Offset>) {
                     translationY = translation.value.y
                 )
         )
+        // DEBUG: Text(text = "Scale: ${scale.value} // Center = ${middle.value + translation.value}, Centroid = ${centroidPos.value}", modifier = Modifier.align(Alignment.TopStart))
     }
 }
