@@ -33,24 +33,18 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ted.gartenhelferlein.Task
 import kotlinx.coroutines.delay
 import kotlin.math.pow
 
+// TODO: Backend
+// TODO: Sort by urgency
+// TODO: Add new tasks
+// TODO: Edit tasks
 
-// TODO: implement list of tasks
-var testTask = Task(
-    id = 1,
-    name = "Lipsum",
-    description = "Lorem Ipsum Dolor Sit Amet Consectetur Adipiscing Elit Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua Ut Enim Ad Minim Veniam Quis Nostrud Exercitation Ullamco",
-    frequency = java.time.Duration.ofSeconds(10),
-    lastCompletion = java.time.LocalDateTime.now().minusDays(1)
-)
-
-var tasks = listOf<Task>(
+var tasks = listOf(
     Task(
         id = 1,
         name = "Lipsum",
@@ -76,8 +70,8 @@ var tasks = listOf<Task>(
 
 @Composable
 fun TasksScreen() {
-    Surface () {
-        Column() {
+    Surface {
+        Column {
             for (task in tasks) {
                 TaskItem(task = task)
             }
@@ -235,11 +229,15 @@ fun urgencyColor(urgency: Float): Color {
         Color(0xFFFFE176),
         Color(0xFF884A4A)
     )
-    return if (urgency in 0.0f..0.7f) {
-        lerp(colors[0], colors[1], urgency*(0.7.pow(-1)).toFloat())
-    } else if (urgency in 0.7f..1.3f) {
-        lerp(colors[1], colors[2], (urgency - 0.7f)*(0.6.pow(-1)).toFloat())
-    } else {
-        colors[2]
+    return when (urgency) {
+        in 0.0f..0.7f -> {
+            lerp(colors[0], colors[1], urgency*(0.7.pow(-1)).toFloat())
+        }
+        in 0.7f..1.3f -> {
+            lerp(colors[1], colors[2], (urgency - 0.7f)*(0.6.pow(-1)).toFloat())
+        }
+        else -> {
+            colors[2]
+        }
     }
 }
