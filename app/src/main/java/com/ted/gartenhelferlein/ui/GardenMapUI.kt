@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,22 +51,28 @@ fun ResetButton(modifier: Modifier, setTranslation: (Offset) -> Unit, setScale: 
 
 @Composable
 fun DrawMap(scale: MutableState<Float>, translation: MutableState<Offset>) {
-    val centroidPos = remember { mutableStateOf(Offset.Zero) }
     val middle = remember {
         mutableStateOf(Offset.Zero)
     }
+
     Box(modifier = Modifier
         .fillMaxSize()
         .onSizeChanged {
             middle.value = Offset(it.width / 2f, it.height / 2f)
         }
         .pointerInput(Unit) {
-            // TODO: Zoom around centroid
             detectTransformGestures { centroid, pan, zoom, _ ->
-                val adjust: Offset = (centroid - (middle.value + translation.value)) * (1f - zoom)
-                centroidPos.value = centroid // DEBUG
-                scale.value *= zoom // TODO: Restrain zoom to zoomRange
-                translation.value += pan + adjust
+                val adjust = (centroid - (middle.value + translation.value)) * (1f - zoom)
+                if (zoom * scale.value > zoomRange.endInclusive) {
+                    scale.value = zoomRange.endInclusive
+                    translation.value += pan
+                } else if (zoom * scale.value < zoomRange.start) {
+                    scale.value = zoomRange.start
+                    translation.value += pan
+                } else {
+                    scale.value *= zoom
+                    translation.value += pan + adjust
+                }
             }
         }) {
         Image(imageVector = ImageVector.vectorResource(id = R.drawable.garten_map),
@@ -78,7 +85,7 @@ fun DrawMap(scale: MutableState<Float>, translation: MutableState<Offset>) {
                     translationX = translation.value.x,
                     translationY = translation.value.y
                 )
+                .clipToBounds()
         )
-        // DEBUG: Text(text = "Scale: ${scale.value} // Center = ${middle.value + translation.value}, Centroid = ${centroidPos.value}", modifier = Modifier.align(Alignment.TopStart))
     }
 }
