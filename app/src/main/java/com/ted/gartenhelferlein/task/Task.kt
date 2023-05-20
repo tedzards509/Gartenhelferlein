@@ -1,4 +1,4 @@
-package com.ted.gartenhelferlein
+package com.ted.gartenhelferlein.task
 
 data class Task (
     val id: Int,
