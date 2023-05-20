@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ted.gartenhelferlein.task.Task
 import kotlinx.coroutines.delay
+import java.time.Duration
+import java.time.LocalDateTime
 import kotlin.math.pow
 
 // TODO: Backend
@@ -49,22 +51,22 @@ var tasks = listOf(
         id = 1,
         name = "Lipsum",
         description = "Lorem Ipsum Dolor Sit Amet Consectetur Adipiscing Elit Sed Do Eiusmod Tempor Incididunt Ut Labore Et Dolore Magna Aliqua Ut Enim Ad Minim Veniam Quis Nostrud Exercitation Ullamco",
-        frequency = java.time.Duration.ofMinutes(2),
-        lastCompletion = java.time.LocalDateTime.now().minusDays(1)
+        frequency = Duration.ofMinutes(2),
+        lastCompletion = LocalDateTime.now().minusDays(1)
     ), Task(
         id = 2,
         name = "Rasen mähen",
         description = "Rasenmäher im Schuppen. Bei Fahrrädern, hinterm Haus und vorm Wintergarten richtung Zufahrt.",
-        frequency = java.time.Duration.ofDays(7),
-        lastCompletion = java.time.LocalDateTime.now().minusDays(6)
+        frequency = Duration.ofDays(7),
+        lastCompletion = LocalDateTime.now().minusDays(6)
     ), Task(
         id = 3,
         name = "Rasensprenger",
         description = "1: Vorgarten (Automatisch)\n" +
                 "2: Hinterm Haus (Automatisch)\n" +
                 "3: Tröpfchen (Außer hinten, Automatisch)",
-        frequency = java.time.Duration.ofDays(1),
-        lastCompletion = java.time.LocalDateTime.now().minusDays(1)
+        frequency = Duration.ofDays(1),
+        lastCompletion = LocalDateTime.now().minusDays(1)
     )
 )
 
