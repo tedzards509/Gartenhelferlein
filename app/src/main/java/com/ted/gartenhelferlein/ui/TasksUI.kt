@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -54,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ted.gartenhelferlein.task.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.ZoneOffset
@@ -64,12 +67,11 @@ import java.time.ZoneOffset
 // TODO: Edit tasks
 
 @Composable
-fun TasksScreen(tasks: MutableList<TaskData>, onComplete: (Int) -> Unit = {}) {
-    println("Drawing tasks screen")
+fun TasksScreen(tasks: MutableStateFlow<List<TaskData>>, onComplete: (Int) -> Unit = {}) {
     Surface {
+        val currentTasks = tasks.collectAsState().value
         Column {
-            tasks.sortByDescending { data -> data.urgency() }
-            for (task in tasks) {
+            for (task in currentTasks) {
                 TaskItem(taskData = task, onComplete = { onComplete(task.id) })
             }
         }
