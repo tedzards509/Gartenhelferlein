@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.sp
 import com.ted.gartenhelferlein.task.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.ZoneOffset
@@ -114,7 +113,9 @@ fun TaskItem(modifier: Modifier = Modifier, taskData: TaskData, onComplete: () -
                             Text(
                                 text = taskData.name,
                                 fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -193,15 +194,21 @@ fun ExpandableCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Title()
-                IconButton(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .rotate(expandButtonRotation.value),
-                    onClick = {
-                        onExpand()
-                    }) {
-                    Icon(imageVector = Icons.Outlined.ArrowDropDown, contentDescription = "Expand Arrow")
+                Box(modifier = Modifier.weight(7f)) {
+                    Title()
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    IconButton(
+                        modifier = Modifier
+                            .rotate(expandButtonRotation.value),
+                        onClick = {
+                            onExpand()
+                        }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowDropDown,
+                            contentDescription = "Expand Arrow"
+                        )
+                    }
                 }
             }
             if (expanded.value) {
