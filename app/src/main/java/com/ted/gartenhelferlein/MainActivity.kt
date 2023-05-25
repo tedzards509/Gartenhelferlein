@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
@@ -61,12 +62,11 @@ class MainActivity : ComponentActivity(), MessageClient.MessageListener {
         messageClient.connect()
     }
 
-
     override fun onMessage(message: String) {
         try {
             val receivedMessage = Json.decodeFromString<ReceivedMessage>(message)
             if (receivedMessage.type == "read" && receivedMessage.data != null) {
-                tasks.value = receivedMessage.data.map { it.toTaskData() }.sortedBy { it.urgency() }
+                tasks.value = receivedMessage.data.map { it.toTaskData() }.sortedByDescending { it.urgency() }
             } else {
                 messageClient.send(Json.encodeToString(SendReadMessage(type = "read", path = "tasks")))
             }
@@ -117,10 +117,15 @@ class MainActivity : ComponentActivity(), MessageClient.MessageListener {
                         title = { Text(getString(R.string.app_name)) },
                         actions = {
                             IconButton(onClick = {
+                                isNewTaskDialogOpen.value = true
+                            }) {
+                                Icon(Icons.Rounded.Edit, contentDescription = "Edit Tasks Database")
+                            }
+                            IconButton(onClick = {
                                 // isNewTaskDialogOpen.value = true
                                 messageClient.send(Json.encodeToString(SendReadMessage(type = "read", path = "tasks")))
                             }) {
-                                Icon(Icons.Rounded.Refresh, contentDescription = "Menu")
+                                Icon(Icons.Rounded.Refresh, contentDescription = "Reload Tasks")
                             }
                         }
                     )
