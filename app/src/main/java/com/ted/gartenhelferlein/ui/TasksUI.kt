@@ -4,6 +4,8 @@ import androidx.annotation.Size
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,10 +62,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.ZoneOffset
 
-// TODO: Backend
-// TODO: Sort by urgency
-// TODO: Add new tasks
-// TODO: Edit tasks
+// TODO: Add new tasks (Plus button)
+// TODO: Edit tasks (Press and hold)
 
 @Composable
 fun TasksScreen(tasks: MutableStateFlow<List<TaskData>>, onComplete: (Int) -> Unit = {}) {
@@ -78,7 +78,7 @@ fun TasksScreen(tasks: MutableStateFlow<List<TaskData>>, onComplete: (Int) -> Un
 }
 
 @Composable
-fun TaskItem(modifier: Modifier = Modifier, taskData: TaskData, onComplete: () -> Unit) {
+fun TaskItem(modifier: Modifier = Modifier, taskData: TaskData, onComplete: () -> Unit, onHold: () -> Unit = {}) {
     Box (modifier = modifier
         .fillMaxWidth()
         .padding(16.dp)
@@ -169,24 +169,29 @@ fun TaskItem(modifier: Modifier = Modifier, taskData: TaskData, onComplete: () -
             onExpand = {
                 expanded.value = !expanded.value
                 lastCompletedText.value = taskData.printLastCompleted()
-            })
+            },
+            onHold = {
+                onHold()
+            }
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ExpandableCard(
     modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
     Title: @Composable () -> Unit,
     Content: @Composable () -> Unit,
-    onExpand: () -> Unit = {}){
+    onExpand: () -> Unit = {},
+    onHold: () -> Unit = {}){
     val expandButtonRotation = animateFloatAsState(targetValue = if (expanded.value) 180f else 0f)
     Card(
-        onClick = { onExpand() },
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize(animationSpec = tween(300)),
+            .animateContentSize(animationSpec = tween(300))
+            .combinedClickable(onClick = { onExpand() }, onLongClick = { onHold() })
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
